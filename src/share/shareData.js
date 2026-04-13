@@ -204,7 +204,10 @@ export function decodeGiftData(encodedPayload) {
 
 export function parseGiftDataFromUrl(urlString) {
   const url = new URL(urlString, window.location.origin);
-  const encodedPayload = url.searchParams.get(SHARE_PARAM);
+  const hashRaw = url.hash.startsWith('#') ? url.hash.slice(1) : url.hash;
+  const hashQuery = hashRaw.startsWith('?') ? hashRaw.slice(1) : hashRaw;
+  const hashParams = new URLSearchParams(hashQuery);
+  const encodedPayload = hashParams.get(SHARE_PARAM) || url.searchParams.get(SHARE_PARAM);
   if (!encodedPayload) {
     return null;
   }
@@ -219,7 +222,12 @@ export function parseGiftDataFromUrl(urlString) {
 
 export function buildShareUrl(rawPayload, baseUrl = window.location.href) {
   const url = new URL(baseUrl, window.location.origin);
-  url.searchParams.set(SHARE_PARAM, encodeGiftData(rawPayload));
+  const hashRaw = url.hash.startsWith('#') ? url.hash.slice(1) : url.hash;
+  const hashQuery = hashRaw.startsWith('?') ? hashRaw.slice(1) : hashRaw;
+  const hashParams = new URLSearchParams(hashQuery);
+  hashParams.set(SHARE_PARAM, encodeGiftData(rawPayload));
+  url.searchParams.delete(SHARE_PARAM);
+  url.hash = hashParams.toString();
   return url.toString();
 }
 
