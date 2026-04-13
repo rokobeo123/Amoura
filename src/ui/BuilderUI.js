@@ -1,6 +1,6 @@
 import {
   MAX_SHARE_IMAGES,
-  buildShareUrl,
+  buildAdaptiveShareUrl,
   normalizeGiftData,
   prepareImagesFromFiles,
 } from '../share/shareData.js';
@@ -85,14 +85,21 @@ export class BuilderUI {
       this.setBusy(true);
       this.imageMeta.textContent = this.getPhotoMetaText();
       try {
-        const payload = await this.collectPayload();
-        const link = buildShareUrl(payload);
+        const { link, optimized } = await this.collectShareLinkData();
         this.linkInput.value = link;
         this.openLink.href = link;
         this.linkBox.classList.remove('hidden');
+        if (optimized) {
+          this.imageMeta.textContent = `${this.getPhotoMetaText()} Auto-optimized for sharing.`;
+        }
       } catch (error) {
         console.error('Failed to generate share link.', error);
-        this.imageMeta.textContent = 'Failed to generate link. Please try smaller images.';
+        if (error && error.code === 'SHARE_LINK_TOO_LARGE') {
+          this.imageMeta.textContent =
+            'Share link is too large. Please use fewer photos or smaller images.';
+        } else {
+          this.imageMeta.textContent = 'Failed to generate link. Please try again.';
+        }
       } finally {
         this.setBusy(false);
       }
@@ -175,6 +182,17 @@ export class BuilderUI {
       message: this.messageInput.value,
       to: this.toInput.value,
     });
+  }
+
+  async collectShareLinkData() {
+    return buildAdaptiveShareUrl(
+      {
+        from: this.fromInput.value,
+        message: this.messageInput.value,
+        to: this.toInput.value,
+      },
+      this.imagesInput.files,
+    );
   }
 
   show() {
