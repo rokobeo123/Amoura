@@ -1,6 +1,6 @@
 import {
   MAX_SHARE_IMAGES,
-  buildAdaptiveShareUrl,
+  buildIdShareUrl,
   normalizeGiftData,
   prepareImagesFromFiles,
 } from '../share/shareData.js';
@@ -83,20 +83,24 @@ export class BuilderUI {
 
     this.generateButton.addEventListener('click', async () => {
       this.setBusy(true);
-      this.imageMeta.textContent = this.getPhotoMetaText();
+      this.imageMeta.textContent = 'Creating short share link...';
       try {
-        const { link, optimized } = await this.collectShareLinkData();
+        const { link, optimized, chunks } = await this.collectShareLinkData();
         this.linkInput.value = link;
         this.openLink.href = link;
         this.linkBox.classList.remove('hidden');
-        if (optimized) {
-          this.imageMeta.textContent = `${this.getPhotoMetaText()} Auto-optimized for sharing.`;
-        }
+        const optimizeText = optimized ? ' (auto-optimized)' : '';
+        this.imageMeta.textContent =
+          `${this.getPhotoMetaText()} Short ID link ready${optimizeText}.` +
+          (chunks > 1 ? ` Stored in ${chunks} parts.` : '');
       } catch (error) {
         console.error('Failed to generate share link.', error);
-        if (error && error.code === 'SHARE_LINK_TOO_LARGE') {
+        if (error && (error.code === 'SHARE_LINK_TOO_LARGE' || error.code === 'SHARE_STORAGE_TOO_LARGE')) {
           this.imageMeta.textContent =
             'Share link is too large. Please use fewer photos or smaller images.';
+        } else if (error && String(error.code || '').startsWith('REMOTE_SHARE_')) {
+          this.imageMeta.textContent =
+            'Short-link service is unavailable right now. Please try again in a moment.';
         } else {
           this.imageMeta.textContent = 'Failed to generate link. Please try again.';
         }
@@ -185,7 +189,7 @@ export class BuilderUI {
   }
 
   async collectShareLinkData() {
-    return buildAdaptiveShareUrl(
+    return buildIdShareUrl(
       {
         from: this.fromInput.value,
         message: this.messageInput.value,

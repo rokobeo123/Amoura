@@ -108,11 +108,15 @@ builderUI = new BuilderUI(app, {
   },
 });
 
-const sharedPayload = parseGiftDataFromUrl(window.location.href);
+async function bootstrap() {
+  const sharedPayload = await parseGiftDataFromUrl(window.location.href);
+  if (sharedPayload) {
+    await launchExperience(sharedPayload);
+    return;
+  }
 
-if (sharedPayload) {
-  launchExperience(sharedPayload);
-} else {
   builderUI.show();
 }
+
+bootstrap();
 
