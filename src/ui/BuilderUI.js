@@ -22,8 +22,14 @@ export class BuilderUI {
     this.element.className = 'builder-overlay';
     this.element.innerHTML = `
       <div class="builder-card">
-        <h1 class="builder-title">Heart Bloom Gift</h1>
-        <p class="builder-subtitle">Create a romantic link with your photos and letter.</p>
+        <div class="builder-kicker"><span>AMOURA / 01</span><span>Private keepsake studio</span></div>
+        <h1 class="builder-title">A small world,<br /><em>made for two.</em></h1>
+        <p class="builder-subtitle">Gather a few photographs and the words you want them to keep. Amoura turns them into a quiet, cinematic surprise.</p>
+        <div class="builder-preview" aria-hidden="true">
+          <span class="builder-preview-mark">A</span>
+          <span class="builder-preview-line"></span>
+          <span class="builder-preview-note">your story<br />will bloom here</span>
+        </div>
 
         <div class="builder-grid">
           <div class="builder-field">
@@ -39,15 +45,15 @@ export class BuilderUI {
             <textarea id="gift-message" placeholder="Write your message..." maxlength="2200"></textarea>
           </div>
           <div class="builder-field full">
-            <label for="gift-images">Photos (up to ${MAX_SHARE_IMAGES})</label>
+            <label for="gift-images">Photographs <span>up to ${MAX_SHARE_IMAGES}</span></label>
             <input id="gift-images" type="file" accept="image/*" multiple />
             <p class="builder-meta" data-image-meta>No photos selected.</p>
           </div>
         </div>
 
         <div class="builder-actions">
-          <button class="builder-btn" data-generate>Generate Share Link</button>
-          <button class="builder-btn ghost" data-preview>Preview Experience</button>
+          <button class="builder-btn" data-generate><span>Seal the keepsake</span><span aria-hidden="true">↗</span></button>
+          <button class="builder-btn ghost" data-preview>Enter preview</button>
         </div>
 
         <div class="builder-link hidden" data-link-box>

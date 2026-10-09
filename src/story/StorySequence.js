@@ -128,6 +128,7 @@ export class StorySequence {
             <rect x="0" y="0" width="460" height="3" rx="14" fill="rgba(255,255,255,0.28)"/>
           </svg>
 
+          <div class="seal-burst" aria-hidden="true">${Array.from({ length: 12 }, (_, index) => `<i style="--i:${index}"></i>`).join('')}</div>
         </div>
         <p class="story-hint"></p>
       </div>
@@ -157,6 +158,7 @@ export class StorySequence {
     this.envelope      = this.element.querySelector('.story-envelope');
     this.miniLetter    = this.element.querySelector('.story-mini-letter');
     this.hint          = this.element.querySelector('.story-hint');
+    this.sealBurst     = this.element.querySelector('.seal-burst');
     this.letterFull    = this.element.querySelector('.story-letter-full');
     this.letterCard    = this.element.querySelector('.story-letter-card');
     this.letterToEl    = this.element.querySelector('.story-letter-to');
@@ -191,6 +193,7 @@ export class StorySequence {
 
     // 1. Open flap
     this.envelope.classList.add('flap-open');
+    this.sealBurst.classList.add('bursting');
     await wait(220);
 
     // 2. Letter rises out from inside without scaling pop
@@ -242,6 +245,7 @@ export class StorySequence {
 
     this.envelopeStage.classList.remove('show', 'hidden-stage');
     this.envelope.classList.remove('flap-open', 'fading');
+    this.sealBurst.classList.remove('bursting');
     this.miniLetter.classList.remove('risen', 'departing');
     this.hint.textContent = '';
 
