@@ -25,7 +25,7 @@ export class EnvelopeModal {
     this.envelope.classList.add('opening');
     await wait(500);
     this.paper.classList.add('rising');
-    await wait(800);
+    await wait(250);
     this.envelope.classList.add('receding');
     await wait(800);
     this.parchment.classList.remove('hidden');

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-const hash = (n) => (Math.sin(n * 127.1 + 311.7) * 43758.5453) % 1;
+const hash = (n) => { const value = Math.sin(n * 127.1 + 311.7) * 43758.5453; return value - Math.floor(value); };
 function heart(i) {
   const u = Math.abs(hash(i * 1.71)) * Math.PI * 2;
   const v = Math.acos(2 * Math.abs(hash(i * 2.31)) - 1);
@@ -27,7 +27,7 @@ export class HeartScene {
     container.append(this.renderer.domElement);
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true; this.controls.dampingFactor = 0.06; this.controls.enablePan = false; this.controls.minDistance = 3; this.controls.maxDistance = 16;
-    this.group = new THREE.Group(); this.scene.add(this.group); this.photos = []; this.raycaster = new THREE.Raycaster(); this.pointer = new THREE.Vector2(); this.clock = new THREE.Clock(); this.focused = null;
+    this.group = new THREE.Group(); this.scene.add(this.group); this.photos = []; this.raycaster = new THREE.Raycaster(); this.pointer = new THREE.Vector2(); this.clock = new THREE.Clock(); this.focused = null; this.focusPosition = new THREE.Vector3(); this.focusNormal = new THREE.Vector3(); this.focusCamera = new THREE.Vector3(); this.focusQuaternion = new THREE.Quaternion();
     this.createHeart(4200); this.createDust(900);
     this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(container); this.resize();
     this.renderer.setAnimationLoop(() => this.frame());
@@ -43,11 +43,12 @@ export class HeartScene {
   createDust(count) { const positions = new Float32Array(count * 3); for (let i = 0; i < count * 3; i += 1) positions[i] = (Math.abs(hash(i * 1.13)) - 0.5) * 30; this.dustGeometry = new THREE.BufferGeometry(); this.dustGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3)); this.dustMaterial = new THREE.PointsMaterial({ color: 0xd9c99e, size: 0.025, transparent: true, opacity: 0.5 }); this.dust = new THREE.Points(this.dustGeometry, this.dustMaterial); this.scene.add(this.dust); }
   async setPhotos(urls) {
     const loader = new THREE.TextureLoader();
+    this.photos.splice(0).forEach((photo) => { this.group.remove(photo); photo.geometry.dispose(); photo.material.map?.dispose(); photo.material.dispose(); });
     const loaded = await Promise.all(urls.map((url) => new Promise((resolve) => loader.load(url, resolve, undefined, () => resolve(null)))));
     loaded.filter(Boolean).forEach((texture, i) => { texture.colorSpace = THREE.SRGBColorSpace; const image = texture.image; const aspect = image.width / Math.max(1, image.height); const card = new THREE.Mesh(new THREE.PlaneGeometry(aspect * 1.25, 1.25), new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide })); const angle = i * 2.399; const radius = 4.4 + Math.min(urls.length, 12) * 0.12; card.position.set(Math.cos(angle) * radius, Math.sin(i * 1.7) * 1.8, Math.sin(angle) * radius); card.lookAt(0, 0, 0); card.userData.base = card.position.clone(); this.group.add(card); this.photos.push(card); });
   }
   pick(event) { if (!this.photos.length) return; const rect = this.renderer.domElement.getBoundingClientRect(); this.pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -((event.clientY - rect.top) / rect.height * 2 - 1)); this.raycaster.setFromCamera(this.pointer, this.camera); const hit = this.raycaster.intersectObjects(this.photos)[0]; this.focused = hit?.object || null; this.photos.forEach((photo) => { photo.material.opacity = this.focused && photo !== this.focused ? 0.42 : 1; }); }
-  frame() { const delta = Math.min(this.clock.getDelta(), 0.05); const time = this.clock.elapsedTime; this.heartMaterial.uniforms.uTime.value = time; this.group.rotation.y += delta * 0.035; this.dust.rotation.y -= delta * 0.012; this.photos.forEach((photo, i) => { photo.position.y = photo.userData.base.y + Math.sin(time * 0.5 + i) * 0.08; if (photo === this.focused) { this.target.copy(photo.position); this.camera.position.lerp(new THREE.Vector3(this.target.x, this.target.y, this.target.z + 3.4), 1 - Math.exp(-delta * 3)); this.controls.target.lerp(this.target, 1 - Math.exp(-delta * 3)); } }); this.controls.update(); this.renderer.render(this.scene, this.camera); }
+  frame() { const delta = Math.min(this.clock.getDelta(), 0.05); const time = this.clock.elapsedTime; this.heartMaterial.uniforms.uTime.value = time; this.group.rotation.y += delta * 0.035; this.dust.rotation.y -= delta * 0.012; this.photos.forEach((photo, i) => { photo.position.y = photo.userData.base.y + Math.sin(time * 0.5 + i) * 0.08; if (photo === this.focused) { photo.getWorldPosition(this.focusPosition); this.focusQuaternion.copy(photo.getWorldQuaternion(this.focusQuaternion)); this.focusNormal.set(0, 0, -1).applyQuaternion(this.focusQuaternion).normalize(); this.focusCamera.copy(this.focusPosition).addScaledVector(this.focusNormal, 3.4); this.camera.position.lerp(this.focusCamera, 1 - Math.exp(-delta * 4)); this.controls.target.lerp(this.focusPosition, 1 - Math.exp(-delta * 4)); } }); this.controls.update(); this.renderer.render(this.scene, this.camera); }
   resize() { const width = this.container.clientWidth || innerWidth; const height = this.container.clientHeight || innerHeight; this.camera.aspect = width / height; this.camera.updateProjectionMatrix(); this.renderer.setSize(width, height, false); }
   dispose() { this.resizeObserver.disconnect(); this.renderer.setAnimationLoop(null); this.heartGeometry.dispose(); this.heartMaterial.dispose(); this.dustGeometry.dispose(); this.dustMaterial.dispose(); this.photos.forEach((photo) => { photo.geometry.dispose(); photo.material.map?.dispose(); photo.material.dispose(); }); this.renderer.dispose(); this.renderer.domElement.remove(); }
 }
