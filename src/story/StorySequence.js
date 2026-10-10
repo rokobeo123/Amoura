@@ -89,9 +89,9 @@ export class StorySequence {
     await wait(480);
     this.miniLetter.classList.add('risen');
     await wait(740);
-    this.miniLetter.classList.add('departing');
+    this.miniLetter.classList.add('hero');
     this.envelope.classList.add('fading');
-    await wait(720);
+    await wait(850);
     this.envelopeStage.classList.add('hidden-stage');
     await wait(260);
     await this.showLetterFull();
@@ -123,7 +123,7 @@ export class StorySequence {
     this.centerText.classList.remove('visible');
     this.envelopeStage.classList.remove('show', 'hidden-stage');
     this.envelope.classList.remove('opening', 'fading');
-    this.miniLetter.classList.remove('risen', 'departing');
+    this.miniLetter.classList.remove('risen', 'hero', 'departing');
     this.hint.textContent = '';
     this.letterFull.classList.remove('visible');
     this.letterFull.classList.add('hidden');
