@@ -1,122 +1,108 @@
 import './styles.css';
-import { SceneSetup } from './core/SceneSetup.js';
-import {
-  MODE_HEART,
-  ParticleSystem,
-  loadPhotoTextures,
-} from './core/ParticleSystem.js';
-import { InteractionController } from './core/InteractionController.js';
-import { StorySequence } from './story/StorySequence.js';
-import { BuilderUI } from './ui/BuilderUI.js';
-import { MusicPlayer } from './ui/MusicPlayer.js';
-import { parseGiftDataFromUrl } from './share/shareData.js';
+import { parseGiftDataFromUrl } from './share/urlCodec.js';
+import { HeartScene } from './scene/HeartScene.js';
+import { EnvelopeModal } from './components/EnvelopeModal.js';
+import { BuilderUI } from './components/BuilderUI.js';
+import { MusicPlayer } from './components/MusicPlayer.js';
 
 const app = document.querySelector('#app');
 
+// 1. Scene Host Container for Three.js WebGL
 const sceneHost = document.createElement('div');
 sceneHost.className = 'scene-host';
 app.appendChild(sceneHost);
 
-const sceneSetup = new SceneSetup(sceneHost);
-sceneSetup.start();
-sceneSetup.setEnabled(false);
+// 2. Floating "Back to Editor" Button (used during preview)
+const backToEditorBtn = document.createElement('button');
+backToEditorBtn.type = 'button';
+backToEditorBtn.className = 'btn-back-editor';
+backToEditorBtn.innerHTML = `
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+  </svg>
+  <span>Return to Editor</span>
+`;
+app.appendChild(backToEditorBtn);
 
-const storySequence = new StorySequence(app);
-new MusicPlayer(app);
+// 3. Floating "Close Focus" Pill (when examining a photo card)
+const focusClosePill = document.createElement('button');
+focusClosePill.type = 'button';
+focusClosePill.className = 'focus-close-pill';
+focusClosePill.innerHTML = `
+  <span>✕ Close Image Focus</span>
+`;
+app.appendChild(focusClosePill);
 
-let particleSystem = null;
-let builderUI = null;
-
-const previewBackButton = document.createElement('button');
-previewBackButton.type = 'button';
-previewBackButton.className = 'preview-back-btn';
-previewBackButton.textContent = 'Back to Create';
-app.appendChild(previewBackButton);
-
-const interactionController = new InteractionController({
-  camera: sceneSetup.camera,
-  controls: sceneSetup.controls,
-  domElement: sceneSetup.renderer.domElement,
-});
-interactionController.setParticleSystem(null);
-
-sceneSetup.addUpdateHandler((delta, elapsed) => {
-  if (!particleSystem) {
-    return;
-  }
-
-  particleSystem.update(delta, elapsed, sceneSetup.camera);
-  interactionController.update(delta);
-});
-
-function setPreviewBackVisible(visible) {
-  previewBackButton.classList.toggle('visible', visible);
-}
-
-function teardownExperience() {
-  sceneSetup.setEnabled(false);
-  sceneHost.classList.remove('active');
-  interactionController.setParticleSystem(null);
-
-  if (particleSystem) {
-    particleSystem.dispose();
-    particleSystem = null;
-  }
-}
-
-previewBackButton.addEventListener('click', () => {
-  setPreviewBackVisible(false);
-  teardownExperience();
-  builderUI.show();
-});
-
-async function launchExperience(payload, { isPreview = false } = {}) {
-  setPreviewBackVisible(false);
-  sceneSetup.setEnabled(false);
-  sceneHost.classList.remove('active');
-
-  await storySequence.play(payload);
-
-  if (particleSystem) {
-    particleSystem.dispose();
-    particleSystem = null;
-  }
-
-  const maxAnisotropy = sceneSetup.renderer.capabilities.getMaxAnisotropy();
-  const maxTextureSize = sceneSetup.renderer.capabilities.maxTextureSize || 8192;
-  const photoTextures = await loadPhotoTextures(payload.images, maxAnisotropy);
-
-  particleSystem = new ParticleSystem(sceneSetup.mainGroup, {
-    particleCount: 4200,
-    photoTextures,
-    anisotropy: maxAnisotropy,
-    maxTextureSize,
-  });
-
-  particleSystem.setMode(MODE_HEART);
-  interactionController.setParticleSystem(particleSystem);
-
-  sceneHost.classList.add('active');
-  sceneSetup.setEnabled(true);
-  setPreviewBackVisible(isPreview);
-}
-
-builderUI = new BuilderUI(app, {
-  onPreview: async (payload) => {
-    builderUI.hide();
-    await launchExperience(payload, { isPreview: true });
+// 4. Initialize Modules
+const heartScene = new HeartScene();
+heartScene.mount(sceneHost, {
+  onCardFocus: (index, isFocused) => {
+    focusClosePill.classList.toggle('visible', isFocused);
   },
 });
 
-async function bootstrap() {
-  const sharedPayload = await parseGiftDataFromUrl(window.location.href);
-  if (sharedPayload) {
-    await launchExperience(sharedPayload);
-    return;
-  }
+focusClosePill.addEventListener('click', () => {
+  heartScene.resetFocus();
+});
 
+const envelopeModal = new EnvelopeModal(app);
+const musicPlayer = new MusicPlayer(app);
+
+let isPreviewMode = false;
+
+// Function to activate the 3D Cosmic Heart experience
+function activate3DScene(payload) {
+  sceneHost.classList.add('active');
+  if (payload?.images && payload.images.length > 0) {
+    heartScene.loadPhotos(payload.images);
+  }
+  if (isPreviewMode) {
+    backToEditorBtn.classList.add('visible');
+  }
+}
+
+// Function to exit experience back to Builder
+function exitExperienceToBuilder() {
+  isPreviewMode = false;
+  backToEditorBtn.classList.remove('visible');
+  focusClosePill.classList.remove('visible');
+  sceneHost.classList.remove('active');
+  heartScene.resetFocus();
+  envelopeModal.hide();
   builderUI.show();
 }
 
-bootstrap();
+backToEditorBtn.addEventListener('click', exitExperienceToBuilder);
 
+// 5. Initialize Builder UI
+const builderUI = new BuilderUI(app, {
+  onPreview: (payload) => {
+    isPreviewMode = true;
+    builderUI.hide();
+    musicPlayer.enableAutoPlay();
+
+    // Play the envelope opening ceremony -> then reveal 3D scene
+    envelopeModal.play(payload, () => {
+      activate3DScene(payload);
+    });
+  },
+});
+
+// 6. Bootstrap Application
+async function bootstrap() {
+  const sharedPayload = parseGiftDataFromUrl(window.location.href);
+
+  if (sharedPayload) {
+    // Recipient Flow: Auto-play the romantic keepsake ceremony
+    builderUI.hide();
+    envelopeModal.play(sharedPayload, () => {
+      activate3DScene(sharedPayload);
+    });
+    musicPlayer.enableAutoPlay();
+  } else {
+    // Creator Flow: Show the luxury Keepsake Studio
+    builderUI.show();
+  }
+}
+
+bootstrap();

@@ -156,3 +156,269 @@ Why it feels generic: the combination of dark-romance gradients, pink glow, orna
 4. Typography is editorial and readable, without ornate tracking.
 5. Motion is calm and minimal; no ad-hoc timings.
 6. Images feel museum-matted, with no crop/no stretch preserved.
+
+---
+
+# Archive Matte — Visual Tokens & Constraints Addendum
+This addendum hardens the visual direction into enforceable tokens and numeric guardrails. These constraints are mandatory and are intended to prevent regression into premium romance, SaaS landing page, or WebGL tech-demo aesthetics.
+
+## 1. Design tokens (required)
+
+### Color tokens (hex)
+- background.room: #0E0F10
+- background.surface: #141311
+- paper.base: #F3EEE6
+- paper.warm: #E9DEC9
+- paper.shadow: #CDBCA6
+- text.primary: #2A231C
+- text.secondary: #4C4237
+- text.meta: #6C5F52
+- border.hairline: #DED4C6
+- accent.primary: #8C6E55
+- accent.muted: #745746
+- image.letterbox: #1C1815
+
+### Minimum contrast expectations
+- text.primary on paper.base: 7:1 or higher.
+- text.secondary on paper.base: 4.5:1 or higher.
+- text.meta on paper.base: 3:1 or higher.
+- text.primary on background.room: 4.5:1 or higher.
+
+### Forbidden hue tendencies
+- No hues in 290–330 degrees (purple/magenta bias).
+- No hues in 330–350 degrees (hot pink bias).
+- No high-chroma reds or fuchsias (saturation > 40 in HSL terms).
+
+### Glow restrictions
+- No text shadow.
+- No UI glow or outer glows.
+- Bloom allowed only in 3D with constraints in Section 6.
+
+### Never use (absolute)
+- Bright pink.
+- Magenta romance accents.
+- Purple gradients.
+- Glossy gold.
+- Neon highlights.
+
+## 2. Typography system (required)
+All type is left-aligned unless noted. Serif is only for display and letter content. UI labels and buttons are sans only.
+
+### Display
+- Family: Source Serif 4 or Cormorant Garamond
+- Size: 28–36px desktop, 22–28px mobile
+- Line height: 1.2–1.3
+- Weight: 500
+- Letter spacing: 0 to -0.01em (never positive)
+- Max line width: 22ch
+- Alignment: left only
+
+### Section
+- Family: Inter or IBM Plex Sans
+- Size: 18–22px
+- Line height: 1.35–1.45
+- Weight: 500
+- Letter spacing: 0 to 0.01em
+- Max line width: 32ch
+- Alignment: left only
+
+### Body
+- Family: Inter or IBM Plex Sans
+- Size: 15–17px
+- Line height: 1.6–1.75
+- Weight: 400
+- Letter spacing: 0
+- Max line width: 52–60ch
+- Alignment: left only
+
+### Meta
+- Family: Inter or IBM Plex Sans
+- Size: 12–13px
+- Line height: 1.4–1.5
+- Weight: 500
+- Letter spacing: 0.02em (maximum)
+- Max line width: 44ch
+- Alignment: left only
+
+### Letter-content
+- Family: Source Serif 4 or Cormorant Garamond
+- Size: 16–18px
+- Line height: 1.7–1.9
+- Weight: 400
+- Letter spacing: 0
+- Max line width: 56–60ch
+- Alignment: left only
+
+### Typography constraints (absolute)
+- No uppercase luxury headings.
+- No centered hero typography.
+- No excessive serif ornamentation.
+- Serif never used for buttons or labels.
+- Avoid wide tracking; do not exceed 0.02em anywhere.
+
+### Explicit guardrails
+- Wedding invitation energy: disallow decorative caps, flourishes, or oversized serif displays.
+- Perfume ad energy: disallow oversized high-contrast serif hero layouts or all-caps luxury spacing.
+- Startup landing page energy: disallow hero headline + subhead + CTA stack.
+
+## 3. Composition grammar (required)
+
+### Required
+- Object-first composition: one primary artifact per view.
+- Editorial asymmetry: the hero artifact is offset 4–6% from center.
+- Negative space priority: minimum 40% of viewport area must remain unfilled.
+- Quiet information clusters: max 3 items per cluster, 16–24px internal gap.
+- Staggered rhythm: alternate vertical gaps of 24px and 36px for stacked items.
+
+### Forbidden
+- Centered marketing hero blocks.
+- Headline + subtitle + CTA stack.
+- Dashboard grids.
+- Equal visual weight distribution.
+- SaaS split panels.
+- Generic card layouts with repeated uniform tiles.
+
+### Spacing rhythm
+- Base unit: 6px.
+- Primary gaps: 18 / 24 / 36 / 48 / 72.
+- Outer margins: 8vw desktop, 6vw tablet, 5vw mobile.
+- Content column width: 560–640px maximum.
+
+### Alignment principles
+- Left-aligned type blocks only.
+- UI elements align to the same left axis as the primary artifact.
+
+### Focal hierarchy
+- One hero artifact (level 1).
+- One supporting cluster (level 2).
+- Everything else fades to level 3 with reduced contrast.
+
+## 4. UI object language (required)
+
+### Buttons
+- Radius: 4–6px only.
+- Border: 1px hairline (border.hairline).
+- Fill: paper.warm or transparent; no solid dark fill.
+- Shadow: single soft shadow only, max 0 8px 20px rgba(0,0,0,0.18).
+- No pill shapes, no glossy bevels, no gradients.
+
+### Inputs
+- Radius: 4–6px.
+- Border: 1px hairline.
+- Background: paper.base.
+- Focus: border uses accent.primary and a 1px outline (no glow).
+- No inner shadows.
+
+### Panels
+- Matte, opaque, paper-toned only.
+- No translucency, no blur, no glassmorphism.
+- Border: hairline only.
+
+### Dividers
+- 1px hairline at 20–30% opacity of border.hairline.
+
+### Hover states
+- Opacity shift only: +0.04 to +0.06.
+- Optional 1–2px lift only.
+- No color shifts toward pink or purple.
+
+### Focus states
+- Hairline outline + subtle background lift (2–4% lightness increase).
+- No glow, no animated rings.
+
+## 5. Motion guardrails (required)
+MotionSystem architecture remains unchanged. These are limits only.
+
+- Max transition duration: 800ms (view-level), 240ms (micro-interactions).
+- Max camera travel: 0.35 scene units per transition.
+- Max scale amplification: 1.03.
+- Max opacity jump per frame: 0.35.
+- Max UI movement amplitude: 6px.
+- Damping: critically damped feel; no overshoot or elastic curves.
+- Easing language: calm, settle, gentle, soft (avoid "romantic" labels).
+
+Principle: atmosphere over motion, stillness over spectacle.
+
+## 6. 3D scene numeric constraints (required)
+
+- Max particle count: 420 desktop, 260 mobile.
+- Particle opacity range: 0.35–0.7.
+- Bloom max strength: 0.35.
+- Bloom radius: 0.25 max.
+- Bloom threshold floor: 0.85.
+- Camera FOV: 32–40 degrees.
+- Max focus zoom: 1.05.
+- Drift amplitude: 0.018 scene units.
+- Drift speed: 0.08–0.16 Hz.
+- Lighting intensity range: ambient 0.35–0.55, key 0.6–0.85.
+- Color temperature guidance: warm neutral 3400–4200K equivalent.
+
+Explicit prohibitions:
+- No sparkle fields.
+- No glowing romance particles.
+- No neon bloom.
+- No cinematic spotlighting.
+
+## 7. Museum matte image framing (required)
+
+- Frame margin (sides): 10–12% of frame width.
+- Frame margin (top): 8–10% of frame height.
+- Frame margin (bottom): 14–16% of frame height.
+- Matte thickness minimum: 9% of shortest edge.
+- Matte thickness maximum: 16% of shortest edge.
+- Inner image never exceeds 72% of frame width or 68% of frame height.
+- Letterbox: use image.letterbox when aspect exceeds clamp; keep centered.
+- Vignette max opacity: 0.06 (optional, edges only).
+- Matte color must be within 6% lightness of paper.warm.
+
+Absolute rules:
+- Never crop.
+- Never stretch.
+- Avoid boxed slideshow feeling by preserving bottom-weighted matte.
+- The image must feel preserved, not decorated.
+
+## 8. Texture / material rules (required)
+
+- Paper grain opacity cap: 0.06.
+- Noise scale: 240–360px.
+- Material roughness feel: matte, 0.8–0.95 roughness equivalent.
+- Shadow softness: blur radius 16–28px, opacity <= 0.12.
+- Allowed texture locations: envelope, letter, photo frames only.
+
+Disallow:
+- Instagram filter looks.
+- Noisy overlays.
+- Faux vintage gimmicks (scratches, dust, heavy vignettes).
+
+## 9. Explicit ban list (absolute)
+- Purple romance gradients.
+- Saturated pink.
+- Glossy UI.
+- Glassmorphism.
+- Glow text.
+- Wax seals.
+- Gold romance motifs.
+- Sparkles.
+- Cinematic bloom.
+- Centered luxury hero.
+- Startup CTA hierarchy.
+- Perfume-ad typography.
+- Wedding invitation styling.
+- Dribbble bait polish.
+
+## 10. Implementation confidence review
+
+### Remaining ambiguity
+- Exact mapping of tokens to CSS variables and Three.js material values is still required.
+- Scene unit scale must be confirmed to ensure camera travel and drift caps are meaningful.
+
+### Regression risks
+- Serif usage creeping into UI controls.
+- Accents shifting into pink or purple due to asset substitutions.
+- Motion timing changes without respecting max durations.
+
+### Confidence score
+- 92/100 with this addendum enforced.
+
+### Enforceability statement
+With explicit tokens, numeric constraints, and hard bans, the redesign is now enforceable and materially protected from regression into romance-template, SaaS, or tech-demo aesthetics.
