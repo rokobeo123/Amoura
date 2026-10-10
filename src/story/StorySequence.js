@@ -81,7 +81,7 @@ export class StorySequence {
     this.letterFromEl.textContent = `From: ${payload.from}`;
     this.addressEl.textContent = payload.to;
     this.envelopeStage.classList.add('show');
-    this.hint.textContent = 'Break the seal to open';
+    this.hint.textContent = 'Open the letter when you are ready';
 
     await nextClick(this.envelope);
     this.hint.textContent = '';
@@ -89,7 +89,7 @@ export class StorySequence {
     await wait(480);
     this.miniLetter.classList.add('risen');
     await wait(740);
-    this.miniLetter.classList.add('hero');
+    this.miniLetter.classList.add('revealing');
     this.envelope.classList.add('fading');
     await wait(850);
     this.envelopeStage.classList.add('hidden-stage');
@@ -123,7 +123,7 @@ export class StorySequence {
     this.centerText.classList.remove('visible');
     this.envelopeStage.classList.remove('show', 'hidden-stage');
     this.envelope.classList.remove('opening', 'fading');
-    this.miniLetter.classList.remove('risen', 'hero', 'departing');
+    this.miniLetter.classList.remove('risen', 'revealing', 'departing');
     this.hint.textContent = '';
     this.letterFull.classList.remove('visible');
     this.letterFull.classList.add('hidden');

@@ -16,3 +16,13 @@
 .story-envelope-stage:has(.story-envelope.fading) .story-hint{opacity:0}
 @media(max-width:840px){.story-mini-letter.hero{transform:translateX(-50%) translateY(-28px) rotate(-1.5deg) scale(1.16)}.story-envelope.fading .story-mini-letter.hero{transform:translate(-50%,-46px) rotate(-1deg) scale(1.28)}}
 .story-envelope.fading{opacity:1}
+
+/* A gentle, consent-forward reveal: the letter is invited into view, never yanked. */
+.story-envelope.opening .envelope-flap{transform:rotateX(-168deg);filter:brightness(1.06)}
+.story-envelope.opening .envelope-seal{opacity:0;transform:translate(-50%,-50%) scale(.9) rotate(4deg)}
+.story-mini-letter.risen{bottom:24%;transform:translateX(-50%) rotate(-1deg);transition:bottom 1.15s cubic-bezier(.22,.75,.25,1),clip-path .9s ease,transform 1.15s cubic-bezier(.22,.75,.25,1),box-shadow .9s ease}
+.story-mini-letter.revealing{bottom:20%;clip-path:inset(0);z-index:12;box-shadow:0 22px 42px rgba(0,0,0,.3);transform:translateX(-50%) translateY(-18px) rotate(0deg) scale(1.08);transition:bottom 1s cubic-bezier(.22,.75,.25,1),transform 1s cubic-bezier(.22,.75,.25,1),box-shadow 1s ease}
+.story-envelope.fading .envelope-shell{opacity:.12;transform:translateY(5px) scale(.98);transition:opacity 1.15s ease,transform 1.15s ease}
+.story-envelope.fading .envelope-shadow{opacity:0;transition:opacity 1s ease}
+.story-envelope.fading .story-mini-letter.revealing{opacity:1;transform:translateX(-50%) translateY(-24px) rotate(0deg) scale(1.1);transition:transform 1s cubic-bezier(.22,.75,.25,1)}
+@media(max-width:840px){.story-mini-letter.revealing{transform:translateX(-50%) translateY(-12px) scale(1.04)}.story-envelope.fading .story-mini-letter.revealing{transform:translateX(-50%) translateY(-16px) scale(1.06)}}
