@@ -433,12 +433,21 @@ export class ParticleSystem {
     this.particleGeometry = new THREE.IcosahedronGeometry(0.078, 0);
     this.particleMaterial = new THREE.MeshStandardMaterial({
       color: 0xffffff,
-      emissive: new THREE.Color(0xff90c6),
-      emissiveIntensity: 0.65,
-      metalness: 0.8,
-      roughness: 0.24,
+      emissive: new THREE.Color(0xd99b8e),
+      emissiveIntensity: 0.72,
+      metalness: 0.72,
+      roughness: 0.28,
       vertexColors: true,
     });
+    this.particleMaterial.onBeforeCompile = (shader) => {
+      shader.uniforms.uTime = { value: 0 };
+      shader.vertexShader = `uniform float uTime;\n` + shader.vertexShader.replace(
+        '#include <begin_vertex>',
+        '#include <begin_vertex>\n transformed += normal * sin(uTime * 1.4 + position.x * 4.0) * 0.012;'
+      );
+      this.particleShader = shader;
+    };
+    this.particleMaterial.customProgramCacheKey = () => 'amoura-starlight-v1';
     this.particleMesh = new THREE.InstancedMesh(
       this.particleGeometry,
       this.particleMaterial,
@@ -630,7 +639,8 @@ export class ParticleSystem {
 
     const globalFocusMix = this.focusedParticle ? 1 : 0;
     this.particleMaterial.emissiveIntensity =
-      0.64 + Math.sin(elapsed * 0.8) * 0.05 + this.scatterMix * 0.1;
+      0.68 + Math.sin(elapsed * 0.8) * 0.05 + this.scatterMix * 0.1;
+    if (this.particleShader) this.particleShader.uniforms.uTime.value = elapsed;
 
     for (let i = 0; i < this.particles.length; i += 1) {
       const particle = this.particles[i];
